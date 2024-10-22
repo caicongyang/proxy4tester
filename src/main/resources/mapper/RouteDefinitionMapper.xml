@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.caicongyang.proxy4tester.mapper.RouteDefinitionMapper">
+
+    <!-- 可以在这里定义复杂的SQL查询 -->
+    
+    <select id="selectAllEnabledRoutes" resultType="com.caicongyang.proxy4tester.entity.RouteDefinition">
+        SELECT * FROM route_definitions WHERE enabled = true
+    </select>
+
+</mapper>
