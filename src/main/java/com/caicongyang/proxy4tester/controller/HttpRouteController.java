@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/routes")
-public class RouteDefinitionController {
+@RequestMapping("/api/http-routes")
+public class HttpRouteController {
 
     @Autowired
     private RouteDefinitionService routeDefinitionService;
@@ -25,24 +25,36 @@ public class RouteDefinitionController {
 
     @PostMapping
     public boolean addRoute(@RequestBody RouteDefinition routeDefinition) {
-        return routeDefinitionService.save(routeDefinition);
+        boolean result = routeDefinitionService.save(routeDefinition);
+        if (result) {
+            routeRefresher.refreshHttpRoutes();
+        }
+        return result;
     }
 
     @PutMapping("/{id}")
     public boolean updateRoute(@PathVariable Long id, @RequestBody RouteDefinition routeDefinition) {
         routeDefinition.setId(id);
-        return routeDefinitionService.updateById(routeDefinition);
+        boolean result = routeDefinitionService.updateById(routeDefinition);
+        if (result) {
+            routeRefresher.refreshHttpRoutes();
+        }
+        return result;
     }
 
     @DeleteMapping("/{id}")
     public boolean deleteRoute(@PathVariable Long id) {
-        return routeDefinitionService.removeById(id);
+        boolean result = routeDefinitionService.removeById(id);
+        if (result) {
+            routeRefresher.refreshHttpRoutes();
+        }
+        return result;
     }
 
     @PostMapping("/refresh")
     public String refreshRoutes() {
-        routeRefresher.refreshRoutes();
-        return "Routes refreshed";
+        routeRefresher.refreshHttpRoutes();
+        return "HTTP routes refreshed";
     }
 
     @PutMapping("/update/{routeId}")
@@ -52,7 +64,6 @@ public class RouteDefinitionController {
             return "Route not found";
         }
         
-        // 确保更新所有相关字段，包括 directResponse
         existingRoute.setPath(routeDefinition.getPath());
         existingRoute.setUri(routeDefinition.getUri());
         existingRoute.setFilters(routeDefinition.getFilters());
@@ -65,9 +76,9 @@ public class RouteDefinitionController {
         
         boolean updated = routeDefinitionService.updateById(existingRoute);
         if (updated) {
-            routeRefresher.refreshRoutes();
-            return "Route updated and refreshed";
+            routeRefresher.refreshHttpRoutes();
+            return "HTTP route updated and refreshed";
         }
-        return "Failed to update route";
+        return "Failed to update HTTP route";
     }
 }

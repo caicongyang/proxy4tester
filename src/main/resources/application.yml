@@ -38,3 +38,10 @@ logging:
     org.springframework.cloud.gateway: DEBUG
     reactor.netty.http.client: DEBUG
     com.caicongyang.proxy4tester: DEBUG
+
+tcp:
+  proxy:
+    boss-threads: 1
+    worker-threads: 4
+    backlog: 128
+    keep-alive: true

@@ -1,29 +1,33 @@
 package com.caicongyang.proxy4tester.config;
 
+import com.caicongyang.proxy4tester.service.TcpRouteDefinitionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.event.RefreshRoutesEvent;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Component;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Component
-public class RouteRefresher implements ApplicationEventPublisherAware {
+public class RouteRefresher {
 
-    private static final Logger logger = LoggerFactory.getLogger(RouteRefresher.class);
+    private final TcpRouteDefinitionService tcpRouteService;
 
     @Autowired
-    private ApplicationEventPublisher publisher;
+    private ApplicationEventPublisher eventPublisher;
 
-    public void refreshRoutes() {
-        logger.info("Refreshing routes");
-        publisher.publishEvent(new RefreshRoutesEvent(this));
-        logger.info("Routes refreshed");
+    public RouteRefresher(TcpRouteDefinitionService tcpRouteService) {
+        this.tcpRouteService = tcpRouteService;
     }
 
-    @Override
-    public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
-        this.publisher = applicationEventPublisher;
+    public void refreshHttpRoutes() {
+        eventPublisher.publishEvent(new RefreshRoutesEvent(this));
+    }
+
+    public void refreshTcpRoutes() {
+        tcpRouteService.refreshRouteCache();
+    }
+
+    public void refreshAllRoutes() {
+        refreshHttpRoutes();
+        refreshTcpRoutes();
     }
 }
