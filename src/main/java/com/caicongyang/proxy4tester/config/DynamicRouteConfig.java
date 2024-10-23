@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.List;  // 添加这行导入语句
+import java.util.List;
 
 /**
  * DynamicRouteConfig 类负责动态配置 Spring Cloud Gateway 的路由。
@@ -37,13 +37,16 @@ public class DynamicRouteConfig {
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
         RouteLocatorBuilder.Builder routes = builder.routes();
         
+        // 获取所有启用的路由定义
         List<RouteDefinition> enabledRoutes = routeDefinitionService.getAllEnabledRoutes();
         logger.info("Loading {} enabled routes", enabledRoutes.size());
         
+        // 遍历所有启用的路由定义，为每个定义创建一个路由
         for (RouteDefinition routeDef : enabledRoutes) {
             logger.info("Configuring route: id={}, path={}, directResponse={}, responseBody={}", 
                         routeDef.getRouteId(), routeDef.getPath(), routeDef.getDirectResponse(), routeDef.getResponseBody());
             
+            // 使用路由定义的信息创建路由
             routes.route(routeDef.getRouteId(),
                 r -> r.path(routeDef.getPath())
                     .filters(f -> f.filter(customResponseFilter.apply(new CustomResponseFilter.Config())))
@@ -51,6 +54,7 @@ public class DynamicRouteConfig {
             );
         }
         
+        // 构建并返回 RouteLocator
         return routes.build();
     }
 }
